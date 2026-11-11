@@ -4,12 +4,7 @@
 //   1-2 stars -> red, 3 stars -> yellow, 4-5 stars -> green.
 // Clicking a star hands a number to the parent — no maths happens here.
 import { useState } from "react";
-
-export function moodColor(stars: number): string {
-  if (stars <= 2) return "text-mood-red";
-  if (stars === 3) return "text-mood-amber";
-  return "text-mood-green";
-}
+import { moodColor } from "@/lib/mood";
 
 export default function StarPicker({
   value,

@@ -3,6 +3,7 @@
 // average and count. This page prints; it does not calculate.
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import PeelLoader from "@/components/PeelLoader";
 import PineappleLogo from "@/components/PineappleLogo";
 import RestaurantBrowser from "@/components/RestaurantBrowser";
@@ -42,6 +43,8 @@ export default function Home() {
 }
 
 async function RestaurantList() {
+  // Always render at request time — the list shows live review counts.
+  await connection();
   const res = await apiGet("/api/restaurants");
   if (!res.ok) {
     throw new Error(`GET /api/restaurants failed with ${res.status}`);

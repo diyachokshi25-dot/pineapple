@@ -6,15 +6,21 @@ import { Suspense } from "react";
 import PeelLoader from "@/components/PeelLoader";
 import ReviewForm from "./ReviewForm";
 
-export default async function ReviewPage({
+export default function ReviewPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  // The id is awaited inside the Suspense child, so the shell prerenders
+  // instantly and the form streams in behind the peeling pineapple.
   return (
     <Suspense fallback={<PeelLoader label="Setting the table…" />}>
-      <ReviewForm restaurantId={Number(id)} />
+      <ReviewContent params={params} />
     </Suspense>
   );
+}
+
+async function ReviewContent({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <ReviewForm restaurantId={Number(id)} />;
 }

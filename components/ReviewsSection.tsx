@@ -4,7 +4,7 @@
 // for "only the N-star reviews" — the backend filters, the frontend prints.
 // The counts on the chips also come from the API (ratingCounts).
 import { useState } from "react";
-import { moodColor } from "./StarPicker";
+import { moodBg, moodColor } from "@/lib/mood";
 import type { Review } from "@/lib/types";
 
 export default function ReviewsSection({
@@ -59,14 +59,16 @@ export default function ReviewsSection({
           <button
             key={n}
             onClick={() => filter(n)}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-all ${
+            className={`rounded-full px-4 py-2 text-sm font-bold text-white transition-all ${
               stars === n
-                ? `${moodColor(n)} bg-current/0 shadow-md ring-2 ring-current`
+                ? `${moodBg(n)} shadow-md`
                 : "bg-white text-crust ring-1 ring-crust/15 hover:ring-grape/50"
             }`}
           >
-            <span className={moodColor(n)}>{"★".repeat(n)}</span>{" "}
-            <span className="text-crust/70">({counts[String(n)] ?? 0})</span>
+            <span>{"★".repeat(n)}</span>{" "}
+            <span className={stars === n ? "text-white/70" : "text-crust/70"}>
+              ({counts[String(n)] ?? 0})
+            </span>
           </button>
         ))}
       </div>

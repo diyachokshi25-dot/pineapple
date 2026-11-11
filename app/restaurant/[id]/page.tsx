@@ -6,13 +6,14 @@
 // Every number here came from GET /api/restaurants/[id]. This page renders.
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import FoodImage from "@/components/FoodImage";
 import PeelLoader from "@/components/PeelLoader";
-import RatingCounter from "@/components/RatingCounter";
+import RatingWindow from "@/components/RatingWindow";
 import ReviewsSection from "@/components/ReviewsSection";
-import StarPicker, { moodColor } from "@/components/StarPicker";
 import { apiGet } from "@/lib/fetch-server";
+import { moodColor } from "@/lib/mood";
 import type { RestaurantDetail } from "@/lib/types";
 
 const FOOD_PICTURE: Record<number, { src: string; emoji: string }> = {
@@ -23,22 +24,36 @@ const FOOD_PICTURE: Record<number, { src: string; emoji: string }> = {
   5: { src: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600&q=80", emoji: "🍸" },
 };
 
-export default async function RestaurantPage({
+export default function RestaurantPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ thanks?: string }>;
 }) {
-  const { id } = await params;
+  // All runtime data access (params, searchParams, the API) happens inside
+  // the Suspense child — so Next.js can prerender the shell instantly and
+  // stream the fresh content in, with the pineapple-peel loader in between.
   return (
     <Suspense fallback={<PeelLoader label="Peeling the reviews…" />}>
-      <RestaurantContent id={Number(id)} thanks={(await searchParams).thanks === "1"} />
+      <RestaurantContent params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function RestaurantContent({ id, thanks }: { id: number; thanks: boolean }) {
+async function RestaurantContent({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ thanks?: string }>;
+}) {
+  const { id: rawId } = await params;
+  const id = Number(rawId);
+  const thanks = (await searchParams).thanks === "1";
+  // This page is different on every request (fresh reviews, fresh averages),
+  // so we tell Next.js to always render it at request time, never prerender.
+  await connection();
   const res = await apiGet(`/api/restaurants/${id}`);
   if (res.status === 404) notFound();
   if (!res.ok) {
@@ -70,7 +85,8 @@ async function RestaurantContent({ id, thanks }: { id: number; thanks: boolean }
       )}
 
       <div className="mt-6 flex flex-col gap-8 lg:flex-row">
-        <div className="lg:flex-1">
+        {/* On mobile the rating window comes first; on desktop it sticks right */}
+        <div className="order-2 lg:order-1 lg:flex-1">
           {/* 3. Latest review, highlighted */}
           <section className="mt-2">
             <h2 className="text-2xl font-black text-crust-dark">Latest review</h2>
@@ -79,7 +95,7 @@ async function RestaurantContent({ id, thanks }: { id: number; thanks: boolean }
                 <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-wider">
                   Latest · what people trust
                 </span>
-                <p className={`mt-3 text-2xl ${"text-mood-amber"}`}>
+                <p className="mt-3 text-2xl">
                   <span className={moodColor(data.latestReview.rating)}>
                     {"★".repeat(data.latestReview.rating)}
                   </span>
@@ -113,34 +129,13 @@ async function RestaurantContent({ id, thanks }: { id: number; thanks: boolean }
           />
         </div>
 
-        <div className="lg:w-96 lg:flex-none">
+        <div className="order-1 lg:order-2 lg:w-96 lg:flex-none">
           {/* 2. Square rating window: big, first thing your eye lands on */}
-          <section className="fade-up sticky top-24 rounded-3xl bg-gradient-to-br from-pineapple to-pineapple-deep p-6 text-center shadow-xl shadow-pineapple/40 ring-4 ring-crust/10">
-            <div className="mx-auto grid aspect-square w-full max-w-72 place-items-center rounded-2xl bg-crust/90 shadow-inner">
-              <div>
-                <RatingCounter value={data.averageRating} />
-                <p className="mt-1 text-4xl text-mood-amber">★★★★★</p>
-                <p className="mt-2 text-sm font-bold uppercase tracking-widest text-cream/80">
-                  {data.totalReviews} review{data.totalReviews === 1 ? "" : "s"}
-                </p>
-              </div>
-            </div>
-            <p className="mt-4 text-sm font-black uppercase tracking-wider text-crust-dark">
-              Rate this place
-            </p>
-            <div className="mt-2 flex justify-center">
-              <StarPicker
-                value={null}
-                size="text-4xl"
-                onSelect={(n) => {
-                  window.location.href = `/review/${id}?rating=${n}`;
-                }}
-              />
-            </div>
-            <p className="mt-2 text-xs font-semibold text-crust/70">
-              1–2 stars red · 3 yellow · 4–5 green — pick a mood
-            </p>
-          </section>
+          <RatingWindow
+            restaurantId={id}
+            averageRating={data.averageRating}
+            totalReviews={data.totalReviews}
+          />
 
           {/* Menu items — each individually reviewable */}
           <section className="mt-6">

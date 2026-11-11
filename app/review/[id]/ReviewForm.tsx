@@ -114,10 +114,10 @@ export default function ReviewForm({ restaurantId }: { restaurantId: number }) {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || !target}
           className="pop mt-4 w-full rounded-2xl bg-grape py-3 font-black text-white shadow-lg shadow-grape/30 disabled:opacity-60"
         >
-          {submitting ? "Filing your hot take…" : "Submit 🍍"}
+          {submitting ? "Filing your hot take…" : !target ? "Setting the table…" : "Submit 🍍"}
         </button>
         <p className="mt-3 text-center text-xs font-medium text-crust/50">
           The backend will re-check your rating — because anyone can talk to an API directly.
