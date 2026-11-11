@@ -85,7 +85,7 @@ async function RestaurantContent({
       )}
 
       <div className="mt-6 flex flex-col gap-8 lg:flex-row">
-        {/* On mobile the rating window comes first; on desktop it sticks right */}
+        {/* On mobile the rating window comes first; on desktop it sits to the right */}
         <div className="order-2 lg:order-1 lg:flex-1">
           {/* 3. Latest review, highlighted */}
           <section className="mt-2">
@@ -104,15 +104,23 @@ async function RestaurantContent({
                 <p className="mt-2 text-lg font-semibold leading-snug">
                   “{data.latestReview.comment}”
                 </p>
-                <time className="mt-2 block text-xs text-white/70">
-                  {new Date(data.latestReview.createdAt).toLocaleString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </time>
+                <p className="mt-2 text-xs text-white/80">
+                  {data.latestReview.username ? (
+                    <span className="font-black text-pineapple">@{data.latestReview.username}</span>
+                  ) : (
+                    <span className="font-bold text-white/60">anonymous</span>
+                  )}
+                  <span>
+                    {" · "}
+                    {new Date(data.latestReview.createdAt).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </p>
               </article>
             ) : (
               <p className="mt-3 rounded-3xl bg-white p-6 font-semibold text-crust/60 ring-1 ring-crust/10">

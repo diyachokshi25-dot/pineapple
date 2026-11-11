@@ -3,14 +3,12 @@
 // The review form. Star picker with mood colours, comment box, submit.
 // `?item=N` in the URL means you're rating one dish; otherwise the place.
 // `?rating=N` pre-fills stars when you tapped one on the restaurant page.
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import StarPicker from "@/components/StarPicker";
 import type { RestaurantDetail } from "@/lib/types";
 
 export default function ReviewForm({ restaurantId }: { restaurantId: number }) {
-  const router = useRouter();
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -50,10 +48,16 @@ export default function ReviewForm({ restaurantId }: { restaurantId: number }) {
     }
     setSubmitting(true);
     try {
+      // Tie the review to the logged-in username (the cookie). The backend
+      // validates it like everything else — it's a fact stored on the row.
+      const match = document.cookie.match(/(?:^|; )pineapple_user=([^;]*)/);
+      const username = match ? decodeURIComponent(match[1]) : null;
+
       const body: Record<string, unknown> = {
         restaurantId,
         rating,
         comment,
+        username,
       };
       if (target?.item) body.menuItemId = target.item.id;
 
@@ -67,8 +71,8 @@ export default function ReviewForm({ restaurantId }: { restaurantId: number }) {
         setError(data?.error ?? "Something went wrong. Try again.");
         return;
       }
-      // The frontend steps back. The restaurant page re-computes everything.
-      router.push(`/restaurant/${restaurantId}?thanks=1`);
+      // The frontend steps back. A real page load re-computes everything fresh.
+      window.location.href = `/restaurant/${restaurantId}?thanks=1`;
     } finally {
       setSubmitting(false);
     }

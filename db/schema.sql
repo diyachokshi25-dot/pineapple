@@ -29,5 +29,6 @@ CREATE TABLE reviews (
   menu_item_id  INTEGER REFERENCES menu_items(id),
   rating        INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment       TEXT NOT NULL,
+  username      TEXT,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

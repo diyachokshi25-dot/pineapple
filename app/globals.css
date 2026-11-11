@@ -49,65 +49,35 @@ body {
   background-size: 56px 64px;
 }
 
-/* Pineapple being peeled like a banana — the official loader of this app.
-   The peel (yellow shells) peels back while the fruit wiggles. */
-.peel-loader {
-  position: relative;
-  width: 72px;
-  height: 96px;
-  animation: wiggle 0.9s ease-in-out infinite;
+/* Pineapple being skinned in a spiral — the official loader of this app.
+   The crosshatched skin slides down and off with a twist (the spiral pull),
+   revealing the pale flesh; the whole fruit wiggles while it happens. */
+.peel-spiral {
+  width: 80px;
+  height: 100px;
+  animation: peel-wiggle 1.6s ease-in-out infinite;
 }
-.peel-loader .peel {
-  position: absolute;
-  width: 18px;
-  height: 56px;
-  background: var(--pineapple-yellow);
-  border-radius: 0 0 50% 50%;
-  transform-origin: top center;
-}
-.peel-loader .peel.left {
-  left: 8px;
-  top: 12px;
-  animation: peel-left 1.4s ease-in-out infinite;
-}
-.peel-loader .peel.right {
-  right: 8px;
-  top: 12px;
-  animation: peel-right 1.4s ease-in-out infinite;
-}
-.peel-loader .fruit {
-  position: absolute;
-  left: 50%;
-  top: 24px;
-  width: 34px;
-  height: 60px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, #ffe29a 0%, var(--pineapple-deep-yellow) 100%);
-  border-radius: 45% 45% 50% 50%;
-}
-.peel-loader .crown {
-  position: absolute;
-  left: 50%;
-  top: -6px;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 14px solid transparent;
-  border-right: 14px solid transparent;
-  border-bottom: 26px solid var(--leaf-green);
+.peel-spiral .peel-skin {
+  animation: peel-slide 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
-@keyframes peel-left {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(72deg) translateY(10px); }
+/* the spiral skinning: slide down, twist as it goes, fade as it leaves */
+@keyframes peel-slide {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(58px) rotate(10deg);
+    opacity: 0;
+  }
 }
-@keyframes peel-right {
-  0%, 100% { transform: rotate(-8deg); }
-  50% { transform: rotate(-72deg) translateY(10px); }
-}
-@keyframes wiggle {
-  0%, 100% { transform: rotate(-6deg); }
-  50% { transform: rotate(6deg); }
+@keyframes peel-wiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
 }
 
 /* Cute bounce used on buttons and cards */

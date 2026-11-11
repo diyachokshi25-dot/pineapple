@@ -20,7 +20,7 @@ export default function RatingWindow({
   const router = useRouter();
 
   return (
-    <section className="fade-up sticky top-24 rounded-3xl bg-gradient-to-br from-pineapple to-pineapple-deep p-6 text-center shadow-xl shadow-pineapple/40 ring-4 ring-crust/10">
+    <section className="fade-up rounded-3xl bg-gradient-to-br from-pineapple to-pineapple-deep p-6 text-center shadow-xl shadow-pineapple/40 ring-4 ring-crust/10">
       <div className="mx-auto grid aspect-square w-full max-w-72 place-items-center rounded-2xl bg-crust/90 shadow-inner">
         <div>
           <RatingCounter value={averageRating} />

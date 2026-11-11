@@ -59,16 +59,16 @@ export default function ReviewsSection({
           <button
             key={n}
             onClick={() => filter(n)}
-            className={`rounded-full px-4 py-2 text-sm font-bold text-white transition-all ${
+            className={`rounded-full px-4 py-2 text-sm font-bold transition-all ${
               stars === n
-                ? `${moodBg(n)} shadow-md`
+                ? `${moodBg(n)} text-white shadow-md`
                 : "bg-white text-crust ring-1 ring-crust/15 hover:ring-grape/50"
             }`}
           >
-            <span>{"★".repeat(n)}</span>{" "}
-            <span className={stars === n ? "text-white/70" : "text-crust/70"}>
-              ({counts[String(n)] ?? 0})
-            </span>
+            <span className={stars === n ? "text-white" : moodColor(n)}>
+              {"★".repeat(n)}
+            </span>{" "}
+            <span className="text-crust/70">({counts[String(n)] ?? 0})</span>
           </button>
         ))}
       </div>
@@ -86,15 +86,23 @@ export default function ReviewsSection({
             </span>
             <div className="min-w-0">
               <p className="font-semibold text-crust-dark">{r.comment}</p>
-              <time className="text-xs text-crust/50">
-                {new Date(r.createdAt).toLocaleString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </time>
+              <p className="mt-0.5 text-xs">
+                {r.username ? (
+                  <span className="font-bold text-grape">@{r.username}</span>
+                ) : (
+                  <span className="font-semibold text-crust/40">anonymous</span>
+                )}
+                <span className="text-crust/50">
+                  {" · "}
+                  {new Date(r.createdAt).toLocaleString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </p>
             </div>
           </article>
         ))}

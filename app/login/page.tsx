@@ -3,12 +3,10 @@
 // purely so the header can greet you. Reviews stay anonymous in the database.
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import PineappleLogo from "@/components/PineappleLogo";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +22,9 @@ export default function LoginPage() {
       return;
     }
     document.cookie = `pineapple_user=${encodeURIComponent(trimmed)}; path=/; max-age=31536000; SameSite=Lax`;
-    router.push("/");
+    // A real page load (not client-side navigation) so the header remounts,
+    // re-reads the cookie we just set, and greets you immediately.
+    window.location.assign("/");
   }
 
   return (

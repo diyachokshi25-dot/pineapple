@@ -12,6 +12,7 @@ function toReview(row: Row) {
     id: row.id,
     rating: row.rating,
     comment: row.comment,
+    username: row.username ?? null,
     createdAt: (row.created_at as Date).toISOString(),
   };
 }
@@ -96,11 +97,11 @@ export async function GET(
   }
 
   const latestRows: Row[] = await sql.query(
-    "SELECT id, rating, comment, created_at FROM reviews WHERE restaurant_id = $1 AND menu_item_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 1",
+    "SELECT id, rating, comment, username, created_at FROM reviews WHERE restaurant_id = $1 AND menu_item_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 1",
     [id]
   );
   const olderRows: Row[] = await sql.query(
-    `SELECT id, rating, comment, created_at FROM reviews
+    `SELECT id, rating, comment, username, created_at FROM reviews
       WHERE restaurant_id = $1 AND menu_item_id IS NULL
         ${stars !== null ? "AND rating = $2" : ""}
       ORDER BY created_at DESC, id DESC

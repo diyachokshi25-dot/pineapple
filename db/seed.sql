@@ -45,8 +45,18 @@ VALUES
   (5, 'Masala Chai Old Fashioned',  'Whiskey that did a yoga retreat',                                  289);
 
 -- 40 sarcastic whole-restaurant reviews per place (menu_item_id IS NULL).
-INSERT INTO reviews (restaurant_id, rating, comment, created_at)
+-- Each row gets a fun username from the pool below, picked deterministically
+-- by row number so the seed is reproducible.
+INSERT INTO reviews (restaurant_id, rating, comment, username, created_at)
 SELECT rid, rating, comment,
+       (ARRAY[
+         'hungry_hippo', 'dosa_diplomat', 'biryani_bandit', 'tangy_tina', 'samosa_sheriff',
+         'lassi_legend', 'chaat_champion', 'paneer_pirate', 'tikka_terminator', 'rasam_raider',
+         'naan_stop_eater', 'curry_curious', 'munch_monkey', 'spicy_sam', 'gulab_gary',
+         'pav_bhaji_pro', 'kebab_king', 'chutney_charlie', 'pakora_pete', 'thali_thinker',
+         'bhurji_bandit', 'masala_maverick', 'kachori_kid', 'papad_pundit', 'halwa_henry',
+         'falooda_fan', 'jalebi_jerry', 'idli_idolizer', 'vada_vulture', 'pulao_professor'
+       ])[1 + (rn % 30)],
        NOW() - (INTERVAL '1 hour' * ((rn * 131) % 960))
 FROM (
   SELECT rid, rating, comment, ROW_NUMBER() OVER () AS rn
@@ -259,22 +269,22 @@ FROM (
   ) AS v(rid, rating, comment)
 ) t;
 
--- Menu-item reviews (about the weird dishes specifically)
-INSERT INTO reviews (restaurant_id, menu_item_id, rating, comment, created_at)
+-- Menu-item reviews (about the weird dishes specifically), with usernames.
+INSERT INTO reviews (restaurant_id, menu_item_id, rating, comment, username, created_at)
 VALUES
-  (1, 1,  5, 'A dosa that rolled away and found its calling.',            NOW() - INTERVAL '5 days'),
-  (1, 1,  4, 'Messy but worth it. Napkins are not optional.',             NOW() - INTERVAL '3 days'),
-  (1, 2,  5, 'Butter chicken in a tortilla. No notes, no self-control.',  NOW() - INTERVAL '6 days'),
-  (1, 3,  4, 'Rajma in a sombrero. Confusing. Correct.',                  NOW() - INTERVAL '2 days'),
-  (1, 5,  5, 'Gulab jamun cheesecake: identity crisis, happy ending.',    NOW() - INTERVAL '1 day'),
-  (2, 6,  4, 'Pav bhaji nachos should not work. They work too well.',     NOW() - INTERVAL '8 days'),
-  (2, 7,  5, 'The crossover episode television refuses to make.',         NOW() - INTERVAL '4 days'),
-  (2, 10, 4, 'Churro kulfi: ambition in dessert form.',                   NOW() - INTERVAL '7 days'),
-  (3, 11, 5, 'Worth every rupee and every tear.',                         NOW() - INTERVAL '4 days'),
-  (3, 12, 5, 'Fried biryani balls. Humanity peaked here.',                NOW() - INTERVAL '9 days'),
-  (3, 15, 4, 'A peace treaty between two desserts, ratified.',            NOW() - INTERVAL '2 days'),
-  (4, 16, 5, 'Ask for extra UFO sauce. Trust the stranger writing this.', NOW() - INTERVAL '6 days'),
-  (4, 17, 5, 'Best 400 calories I ever spent.',                           NOW() - INTERVAL '3 days'),
-  (4, 19, 4, 'Carbs went on a date. It went well.',                       NOW() - INTERVAL '10 days'),
-  (5, 21, 4, 'The crust cracks like it means it.',                        NOW() - INTERVAL '2 days'),
-  (5, 24, 5, 'Six shots of pure lawlessness.',                            NOW() - INTERVAL '5 days');
+  (1, 1,  5, 'A dosa that rolled away and found its calling.',            'dosa_diplomat',    NOW() - INTERVAL '5 days'),
+  (1, 1,  4, 'Messy but worth it. Napkins are not optional.',             'munch_monkey',     NOW() - INTERVAL '3 days'),
+  (1, 2,  5, 'Butter chicken in a tortilla. No notes, no self-control.',  'gulab_gary',       NOW() - INTERVAL '6 days'),
+  (1, 3,  4, 'Rajma in a sombrero. Confusing. Correct.',                  'tangy_tina',       NOW() - INTERVAL '2 days'),
+  (1, 5,  5, 'Gulab jamun cheesecake: identity crisis, happy ending.',    'gulab_gary',       NOW() - INTERVAL '1 day'),
+  (2, 6,  4, 'Pav bhaji nachos should not work. They work too well.',     'pav_bhaji_pro',    NOW() - INTERVAL '8 days'),
+  (2, 7,  5, 'The crossover episode television refuses to make.',         'tikka_terminator', NOW() - INTERVAL '4 days'),
+  (2, 10, 4, 'Churro kulfi: ambition in dessert form.',                   'falooda_fan',      NOW() - INTERVAL '7 days'),
+  (3, 11, 5, 'Worth every rupee and every tear.',                         'biryani_bandit',   NOW() - INTERVAL '4 days'),
+  (3, 12, 5, 'Fried biryani balls. Humanity peaked here.',                'kebab_king',       NOW() - INTERVAL '9 days'),
+  (3, 15, 4, 'A peace treaty between two desserts, ratified.',            'halwa_henry',      NOW() - INTERVAL '2 days'),
+  (4, 16, 5, 'Ask for extra UFO sauce. Trust the stranger writing this.', 'spicy_sam',        NOW() - INTERVAL '6 days'),
+  (4, 17, 5, 'Best 400 calories I ever spent.',                           'lassi_legend',     NOW() - INTERVAL '3 days'),
+  (4, 19, 4, 'Carbs went on a date. It went well.',                       'samosa_sheriff',   NOW() - INTERVAL '10 days'),
+  (5, 21, 4, 'The crust cracks like it means it.',                        'thali_thinker',    NOW() - INTERVAL '2 days'),
+  (5, 24, 5, 'Six shots of pure lawlessness.',                            'kachori_kid',      NOW() - INTERVAL '5 days');

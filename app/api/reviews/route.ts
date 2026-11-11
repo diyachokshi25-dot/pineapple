@@ -15,11 +15,12 @@ export async function POST(request: Request) {
     return Response.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
 
-  const { restaurantId, rating, comment, menuItemId: menuItem } = (body ?? {}) as {
+  const { restaurantId, rating, comment, menuItemId: menuItem, username: rawUsername } = (body ?? {}) as {
     restaurantId?: unknown;
     rating?: unknown;
     comment?: unknown;
     menuItemId?: unknown;
+    username?: unknown;
   };
 
   // Check 1 — rating
@@ -33,6 +34,22 @@ export async function POST(request: Request) {
   // Check 2 — comment
   if (typeof comment !== "string" || comment.trim().length === 0) {
     return Response.json({ error: "Comment cannot be empty." }, { status: 400 });
+  }
+
+  // Check 2.5 — username is OPTIONAL (reviews can stay anonymous), but if it
+  // shows up it must be a real, short string. It is stored as a fact on the
+  // row, never used to compute anything.
+  let username: string | null = null;
+  if (rawUsername !== null && rawUsername !== undefined) {
+    if (typeof rawUsername !== "string") {
+      return Response.json({ error: "username must be a string." }, { status: 400 });
+    }
+    username = rawUsername.trim();
+    if (username.length === 0) {
+      username = null;
+    } else if (username.length > 30) {
+      return Response.json({ error: "username must be 30 characters or fewer." }, { status: 400 });
+    }
   }
 
   // Check 3 — restaurant must actually exist (a database lookup)
@@ -71,8 +88,8 @@ export async function POST(request: Request) {
 
   // All checks passed — write exactly one row of FACTS. Nothing else changes.
   const inserted: Row[] = await sql.query(
-    "INSERT INTO reviews (restaurant_id, menu_item_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING id",
-    [restaurantId, menuItemId, rating, comment.trim()]
+    "INSERT INTO reviews (restaurant_id, menu_item_id, rating, comment, username) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+    [restaurantId, menuItemId, rating, comment.trim(), username]
   );
 
   return Response.json({ success: true, reviewId: inserted[0].id }, { status: 201 });
