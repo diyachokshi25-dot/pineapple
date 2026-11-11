@@ -15,10 +15,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
 
-  const { restaurantId, rating, comment } = (body ?? {}) as {
+  const { restaurantId, rating, comment, menuItemId: menuItem } = (body ?? {}) as {
     restaurantId?: unknown;
     rating?: unknown;
     comment?: unknown;
+    menuItemId?: unknown;
   };
 
   // Check 1 — rating
@@ -48,10 +49,30 @@ export async function POST(request: Request) {
     );
   }
 
+  // Optional: a review can be about one menu item instead of the whole place.
+  // Same rule applies — if an item is named, it must actually exist on that menu.
+  const menuItemId =
+    menuItem === null || menuItem === undefined ? null : menuItem;
+  if (menuItemId !== null) {
+    if (typeof menuItemId !== "number" || !Number.isInteger(menuItemId)) {
+      return Response.json({ error: "menuItemId must be a whole number." }, { status: 400 });
+    }
+    const item: Row[] = await sql.query(
+      "SELECT id FROM menu_items WHERE id = $1 AND restaurant_id = $2",
+      [menuItemId, restaurantId]
+    );
+    if (item.length === 0) {
+      return Response.json(
+        { error: `Menu item ${menuItemId} does not exist on restaurant ${restaurantId}.` },
+        { status: 400 }
+      );
+    }
+  }
+
   // All checks passed — write exactly one row of FACTS. Nothing else changes.
   const inserted: Row[] = await sql.query(
-    "INSERT INTO reviews (restaurant_id, rating, comment) VALUES ($1, $2, $3) RETURNING id",
-    [restaurantId, rating, comment.trim()]
+    "INSERT INTO reviews (restaurant_id, menu_item_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING id",
+    [restaurantId, menuItemId, rating, comment.trim()]
   );
 
   return Response.json({ success: true, reviewId: inserted[0].id }, { status: 201 });

@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --pineapple-yellow: #f6b73c;
+  --pineapple-deep-yellow: #e8a41f;
+  --leaf-green: #1f5e2e;
+  --leaf-bright: #2e7d3a;
+  --crust-brown: #4a2c14;
+  --crust-dark: #33200e;
+  --cream: #fff7e6;
+  --loud-purple: #7c3aed;
+  --purple-shout: #9333ea;
+  --mood-red: #dc2626;
+  --mood-amber: #f59e0b;
+  --mood-green: #16a34a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-pineapple: var(--pineapple-yellow);
+  --color-pineapple-deep: var(--pineapple-deep-yellow);
+  --color-leaf: var(--leaf-green);
+  --color-leaf-bright: var(--leaf-bright);
+  --color-crust: var(--crust-brown);
+  --color-crust-dark: var(--crust-dark);
+  --color-cream: var(--cream);
+  --color-grape: var(--loud-purple);
+  --color-grape-shout: var(--purple-shout);
+  --color-mood-red: var(--mood-red);
+  --color-mood-amber: var(--mood-amber);
+  --color-mood-green: var(--mood-green);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--cream);
+  color: var(--crust-dark);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Honeycomb texture — the pineapple's crown, as a repeating SVG pattern */
+.honeycomb {
+  background-image: url("data:image/svg+xml,%3Csvg width='56' height='64' viewBox='0 0 56 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 0l14 8v16L28 32 14 24V8zM28 32l14 8v16L28 64 14 56V40zM0 24l14 8v16L0 56m56-32l-14 8v16l14-8' fill='none' stroke='%23f6b73c' stroke-opacity='0.25' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-size: 56px 64px;
+}
+
+.honeycomb-dark {
+  background-image: url("data:image/svg+xml,%3Csvg width='56' height='64' viewBox='0 0 56 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 0l14 8v16L28 32 14 24V8zM28 32l14 8v16L28 64 14 56V40zM0 24l14 8v16L0 56m56-32l-14 8v16l14-8' fill='none' stroke='%23fff7e6' stroke-opacity='0.14' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-size: 56px 64px;
+}
+
+/* Pineapple being peeled like a banana — the official loader of this app.
+   The peel (yellow shells) peels back while the fruit wiggles. */
+.peel-loader {
+  position: relative;
+  width: 72px;
+  height: 96px;
+  animation: wiggle 0.9s ease-in-out infinite;
+}
+.peel-loader .peel {
+  position: absolute;
+  width: 18px;
+  height: 56px;
+  background: var(--pineapple-yellow);
+  border-radius: 0 0 50% 50%;
+  transform-origin: top center;
+}
+.peel-loader .peel.left {
+  left: 8px;
+  top: 12px;
+  animation: peel-left 1.4s ease-in-out infinite;
+}
+.peel-loader .peel.right {
+  right: 8px;
+  top: 12px;
+  animation: peel-right 1.4s ease-in-out infinite;
+}
+.peel-loader .fruit {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  width: 34px;
+  height: 60px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #ffe29a 0%, var(--pineapple-deep-yellow) 100%);
+  border-radius: 45% 45% 50% 50%;
+}
+.peel-loader .crown {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 26px solid var(--leaf-green);
+}
+
+@keyframes peel-left {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(72deg) translateY(10px); }
+}
+@keyframes peel-right {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(-72deg) translateY(10px); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+/* Cute bounce used on buttons and cards */
+.pop {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.pop:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+.pop:active {
+  transform: scale(0.97);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fade-up 0.45s ease both;
+}
+
+@keyframes star-pop {
+  0% { transform: scale(0.4) rotate(-30deg); }
+  60% { transform: scale(1.35) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.star-pop {
+  animation: star-pop 0.35s ease both;
 }
